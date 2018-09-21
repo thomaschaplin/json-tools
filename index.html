@@ -1,60 +1,87 @@
-
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="author" content="Thomas Chaplin">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>JSON Tools</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    </head>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Thomas Chaplin">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JSON Tools</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+</head>
+
 <body class="p-3 mb-2 bg-dark text-white">
-    <div align="center">
-        <h1 style="text-align:center">JSON Tools</h1>
-        <textarea class="form-control" id="jsonField" onkeyup="blankText()" cols=20 rows=30></textarea>
+    <div>
+        <h1>JSON Tools</h1>
+        <textarea class="form-control" id="jsonField" onkeyup="blankText()" placeholder="Input JSON Here..."></textarea>
         <br>
         <button type="button" class="btn btn-light" id="pretty-button" onclick="prettyPrint()" disabled>Pretty Print</button>
-        <button type="button" class="btn btn-light" id="validate-button" onclick="validateJson($('#jsonField').value)" disabled>Validate</button>
+        <button type="button" class="btn btn-light" id="validate-button" onclick="validateJson($('#jsonField').value)"
+            disabled>Validate</button>
         <button type="button" class="btn btn-light" id="copy-button" onclick="copyText('pretty')" disabled>Copy</button>
-		<button type="button" class="btn btn-light" id="copy-button" onclick="clearText()" disabled>Clear</button>
+        <button type="button" class="btn btn-light" id="copy-button" onclick="clearText()" disabled>Clear</button>
     </div>
 </body>
-    <script>
-        function prettyPrint() {
-            var ugly = document.getElementById('jsonField').value
-            var obj = JSON.parse(ugly)
-            var pretty = JSON.stringify(obj, undefined, 2)
-            document.getElementById('jsonField').value = pretty
+<style>
+    body {
+        position: absolute;
+        width: 100%;
+        height: 20px;
+        top: 0%;
+        margin-top: -10px;
+        bottom: 0%;
+        text-align: center;
+        font-family: "Consolas";
+    }
+
+    textarea {
+        overflow: auto;
+        resize: none;
+        min-height: 75vh;
+    }
+</style>
+
+<script>
+    function prettyPrint() {
+        var ugly = document.getElementById('jsonField').value
+        var obj = JSON.parse(ugly)
+        var pretty = JSON.stringify(obj, undefined, 2)
+        document.getElementById('jsonField').value = pretty
+    }
+    function copyText(t) {
+        let textToCopy = document.getElementById(`jsonField`)
+        textToCopy.select()
+        document.execCommand("copy")
+    }
+    function validateJson() {
+        let textToCopy = document.getElementById(`jsonField`)
+        try {
+            JSON.parse(textToCopy.value)
+            alert("Valid JSON")
+        } catch (err) {
+            alert(err)
         }
-        function copyText(t) {
-            let textToCopy = document.getElementById(`jsonField`)
-            textToCopy.select()
-            document.execCommand("copy")
+    }
+    function blankText() {
+        const btnList = $('.btn')
+        const flag = document.getElementById("jsonField").value === ""
+        for (let i in btnList) {
+            btnList[i].disabled = flag
         }
-        function validateJson(){
-			let textToCopy = document.getElementById(`jsonField`)
-			try {
-                JSON.parse(textToCopy.value)
-				alert("Valid JSON")
-            } catch(err) {
-                alert(err)
-            }
-        }
-        function blankText() {
-            const btnList= $('.btn')
-			const flag = document.getElementById("jsonField").value===""
-				for(let i in btnList) {
-					btnList[i].disabled = flag
-				}				
-        }
-		function clearText() {
-			document.getElementById('jsonField').value = ""
-			blankText()
-		}		
-    </script>
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    }
+    function clearText() {
+        document.getElementById('jsonField').value = ""
+        blankText()
+    }
+</script>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
+
 </html>
