@@ -43,10 +43,16 @@
 
 <script>
     function prettyPrint() {
+        let textToCopy = document.getElementById(`jsonField`)
         var ugly = document.getElementById('jsonField').value
-        var obj = JSON.parse(ugly)
-        var pretty = JSON.stringify(obj, undefined, 2)
-        document.getElementById('jsonField').value = pretty
+        try {
+            var obj = JSON.parse(ugly)
+            var pretty = JSON.stringify(obj, undefined, 2)
+            JSON.parse(textToCopy.value)
+            document.getElementById('jsonField').value = pretty
+        } catch (err) {
+            alert(err)
+        }
     }
     function copyText(t) {
         let textToCopy = document.getElementById(`jsonField`)
