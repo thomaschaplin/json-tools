@@ -16,8 +16,10 @@
         <textarea class="form-control" id="jsonField" onkeyup="blankText()" placeholder="Input JSON Here..."></textarea>
         <br>
         <button type="button" class="btn btn-light" id="pretty-button" onclick="prettyPrint()" disabled>Pretty Print</button>
+        <button type="button" class="btn btn-light" id="pretty-button" onclick="minify()" disabled>Minify</button>
         <button type="button" class="btn btn-light" id="validate-button" onclick="validateJson($('#jsonField').value)"
             disabled>Validate</button>
+        <button type="button" class="btn btn-light" id="copy-button" onclick="downloadJson()" disabled>Download JSON</button>
         <button type="button" class="btn btn-light" id="copy-button" onclick="copyText('pretty')" disabled>Copy</button>
         <button type="button" class="btn btn-light" id="copy-button" onclick="clearText()" disabled>Clear</button>
     </div>
@@ -53,6 +55,39 @@
         } catch (err) {
             alert(err)
         }
+    }
+    function minify() {
+        let textToCopy = document.getElementById(`jsonField`)
+        var ugly = document.getElementById('jsonField').value
+        try {
+            var obj = JSON.parse(ugly)
+            var pretty = JSON.stringify(obj)
+            JSON.parse(textToCopy.value)
+            document.getElementById('jsonField').value = pretty
+        } catch (err) {
+            alert(err)
+        }
+    }
+    function downloadJson() {
+        var element = document.createElement("a");
+        let textToCopy = document.getElementById(`jsonField`)
+        var ugly = document.getElementById('jsonField').value
+        try {
+            var obj = JSON.parse(ugly)
+            var pretty = JSON.stringify(obj, undefined, 2)
+            JSON.parse(textToCopy.value)
+            document.getElementById('jsonField').value = pretty
+            element.setAttribute("href", "data:application/json;charset=utf-8," + encodeURIComponent(pretty));
+            element.setAttribute("download", currentTime()+".json");
+            element.style.display = "none";
+            document.body.appendChild(element);
+            element.click();
+        } catch (err) {
+            alert(err)
+        }
+    }
+    function currentTime() {
+        return Math.round(new Date().getTime()/1000).toString()
     }
     function copyText(t) {
         let textToCopy = document.getElementById(`jsonField`)
