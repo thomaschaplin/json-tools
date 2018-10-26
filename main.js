@@ -20,7 +20,7 @@ function dropJSON(targetEl, callback) {
 dropJSON(
     document.getElementById(`body`),
     function (data) {
-        document.getElementById('jsonField').value = JSON.stringify(data, undefined, 2);
+        document.getElementById('jsonField').value = JSON.stringify(data);
         blankText()
     }
 );
