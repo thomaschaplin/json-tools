@@ -1,3 +1,30 @@
+function dropJSON(targetEl, callback) {
+    targetEl.addEventListener('dragenter', function (e) { e.preventDefault(); });
+    targetEl.addEventListener('dragover', function (e) { e.preventDefault(); });
+
+    targetEl.addEventListener('drop', function (event) {
+
+        var reader = new FileReader();
+        reader.onloadend = function () {
+            if (isValidJson(this.result) === true) {
+                var data = JSON.parse(this.result);
+                callback(data);
+            } else alert(`Not a valid JSON file`)
+        };
+
+        reader.readAsText(event.dataTransfer.files[0]);
+        event.preventDefault();
+    });
+}
+
+dropJSON(
+    document.getElementById(`body`),
+    function (data) {
+        document.getElementById('jsonField').value = JSON.stringify(data, undefined, 2);
+        blankText()
+    }
+);
+
 function prettyPrint() {
     let textToCopy = document.getElementById(`jsonField`)
     var ugly = document.getElementById('jsonField').value
@@ -55,6 +82,14 @@ function validateJson() {
         alert("Valid JSON")
     } catch (err) {
         alert(err)
+    }
+}
+function isValidJson(json) {
+    try {
+        JSON.parse(json)
+        return true
+    } catch (err) {
+        return false
     }
 }
 function blankText() {
