@@ -18,12 +18,12 @@
         <textarea class="form-control" id="jsonField" onkeyup="blankText()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Input or drop JSON or JSON5 here..."></textarea>
         <br>
         <button type="button" class="btn btn-light" id="pretty-button" onclick="prettyPrint()" disabled>Pretty Print</button>
-        <button type="button" class="btn btn-light" id="pretty-button" onclick="minify()" disabled>Minify</button>
-        <button type="button" class="btn btn-light" id="validate-button" onclick="validateJson()" disabled>Validate JSON</button>
-        <button type="button" class="btn btn-light" id="json5-button" onclick="validateJson5()" disabled>Validate JSON5</button>
-        <button type="button" class="btn btn-light" id="copy-button" onclick="downloadJson()" disabled>Download</button>
+        <button type="button" class="btn btn-light" id="minify-button" onclick="minify()" disabled>Minify</button>
+        <button type="button" class="btn btn-light" id="validate-json-button" onclick="validateJson()" disabled>Validate JSON</button>
+        <button type="button" class="btn btn-light" id="validate-json5-button" onclick="validateJson5()" disabled>Validate JSON5</button>
+        <button type="button" class="btn btn-light" id="download-button" onclick="downloadJson()" disabled>Download</button>
         <button type="button" class="btn btn-light" id="copy-button" onclick="copyText('pretty')" disabled>Copy</button>
-        <button type="button" class="btn btn-light" id="copy-button" onclick="clearText()" disabled>Clear</button>
+        <button type="button" class="btn btn-light" id="clear-button" onclick="clearText()" disabled>Clear</button>
     </div>
 </body>
 
