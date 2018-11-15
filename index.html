@@ -15,7 +15,7 @@
 <body class="p-3 mb-2 bg-dark text-white" id="body">
     <div>
         <h1>JSON Tools</h1>
-        <textarea class="form-control" id="jsonField" onkeyup="blankText()" placeholder="Input or drop JSON here..."></textarea>
+        <textarea class="form-control" id="jsonField" onkeyup="blankText()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Input or drop JSON here..."></textarea>
         <br>
         <button type="button" class="btn btn-light" id="pretty-button" onclick="prettyPrint()" disabled>Pretty Print</button>
         <button type="button" class="btn btn-light" id="pretty-button" onclick="minify()" disabled>Minify</button>
