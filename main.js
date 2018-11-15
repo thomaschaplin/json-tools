@@ -9,7 +9,10 @@ function dropJSON(targetEl, callback) {
             if (isValidJson(this.result) === true) {
                 var data = JSON.parse(this.result);
                 callback(data);
-            } else alert(`Not a valid JSON file`)
+            } else if (isValidJson5(this.result) === true) {
+                var data = JSON5.parse(this.result);
+                callback(data);
+            } else alert(`Not a valid JSON / JSON5 file`)
         };
 
         reader.readAsText(event.dataTransfer.files[0]);
@@ -20,34 +23,47 @@ function dropJSON(targetEl, callback) {
 dropJSON(
     document.getElementById(`body`),
     function (data) {
-        document.getElementById('jsonField').value = JSON.stringify(data);
-        blankText()
+        if (isValidJson() === true) {
+            document.getElementById('jsonField').value = JSON.stringify(data);
+            blankText()
+        } else if (isValidJson5() === true) {
+            document.getElementById('jsonField').value = JSON5.stringify(data);
+            blankText()
+        } else {
+            alert("Unhandled exception")
+        }
     }
 );
 
 function prettyPrint() {
-    let textToCopy = document.getElementById(`jsonField`)
-    var ugly = document.getElementById('jsonField').value
-    try {
-        var obj = JSON.parse(ugly)
-        var pretty = JSON.stringify(obj, undefined, 2)
-        JSON.parse(textToCopy.value)
-        document.getElementById('jsonField').value = pretty
-    } catch (err) {
-        alert(err)
+    let textToCopy = document.getElementById(`jsonField`).value
+    if (isValidJson() === true) {
+        let x = JSON.parse(textToCopy)
+        document.getElementById(`jsonField`).value = JSON.stringify(x, undefined, 2)
+    } else if (isValidJson5() === true) {
+        let x = JSON5.parse(textToCopy)
+        document.getElementById(`jsonField`).value = JSON5.stringify(x, undefined, 2)
+    } else if (isValidJson() === false || isValidJson() === false) {
+        validateJson()
+        validateJson5()
+    } else {
+        alert("Unhandled exception")
     }
 }
 
 function minify() {
-    let textToCopy = document.getElementById(`jsonField`)
-    var ugly = document.getElementById('jsonField').value
-    try {
-        var obj = JSON.parse(ugly)
-        var pretty = JSON.stringify(obj)
-        JSON.parse(textToCopy.value)
-        document.getElementById('jsonField').value = pretty
-    } catch (err) {
-        alert(err)
+    let textToCopy = document.getElementById(`jsonField`).value
+    if (isValidJson() === true) {
+        let x = JSON.parse(textToCopy)
+        document.getElementById(`jsonField`).value = JSON.stringify(x)
+    } else if (isValidJson5() === true) {
+        let x = JSON5.parse(textToCopy)
+        document.getElementById(`jsonField`).value = JSON5.stringify(x)
+    } else if (isValidJson() === false || isValidJson() === false) {
+        validateJson()
+        validateJson5()
+    } else {
+        alert("Unhandled exception")
     }
 }
 
@@ -55,18 +71,37 @@ function downloadJson() {
     var element = document.createElement("a");
     let textToCopy = document.getElementById(`jsonField`)
     var ugly = document.getElementById('jsonField').value
-    try {
-        var obj = JSON.parse(ugly)
-        var pretty = JSON.stringify(obj, undefined, 2)
-        JSON.parse(textToCopy.value)
-        document.getElementById('jsonField').value = pretty
-        element.setAttribute("href", "data:application/json;charset=utf-8," + encodeURIComponent(pretty));
-        element.setAttribute("download", currentTime() + ".json");
-        element.style.display = "none";
-        document.body.appendChild(element);
-        element.click();
-    } catch (err) {
-        alert(err)
+
+    if (isValidJson() === true) {
+        try {
+            var obj = JSON.parse(ugly)
+            var pretty = JSON.stringify(obj, undefined, 2)
+            JSON.parse(textToCopy.value)
+            document.getElementById('jsonField').value = pretty
+            element.setAttribute("href", "data:application/json;charset=utf-8," + encodeURIComponent(pretty));
+            element.setAttribute("download", currentTime() + ".json");
+            element.style.display = "none";
+            document.body.appendChild(element);
+            element.click();
+        } catch (err) {
+            alert(err)
+        }
+    } else if (isValidJson5() === true) {
+        try {
+            var obj = JSON5.parse(ugly)
+            var pretty = JSON5.stringify(obj, undefined, 2)
+            JSON5.parse(textToCopy.value)
+            document.getElementById('jsonField').value = pretty
+            element.setAttribute("href", "data:application/json;charset=utf-8," + encodeURIComponent(pretty));
+            element.setAttribute("download", currentTime() + ".json");
+            element.style.display = "none";
+            document.body.appendChild(element);
+            element.click();
+        } catch (err) {
+            alert(err)
+        }
+    } else {
+        alert("Unhandled exception")
     }
 }
 
@@ -100,9 +135,9 @@ function isValidJson() {
 }
 
 function isValidJson5() {
-    let textToCopy = document.getElementById(`jsonField`)
+    let textToCopy = document.getElementById(`jsonField`).value
     try {
-        JSON5.parse(textToCopy.value)
+        JSON5.parse(textToCopy)
         return true
     } catch (err) {
         return false
@@ -110,9 +145,9 @@ function isValidJson5() {
 }
 
 function validateJson5() {
-    let textToCopy = document.getElementById(`jsonField`)
+    let textToCopy = document.getElementById(`jsonField`).value
     try {
-        JSON5.parse(textToCopy.value)
+        JSON5.parse(textToCopy)
         alert("Valid JSON5")
     } catch (err) {
         alert(err)
