@@ -37,6 +37,7 @@ function prettyPrint() {
         alert(err)
     }
 }
+
 function minify() {
     let textToCopy = document.getElementById(`jsonField`)
     var ugly = document.getElementById('jsonField').value
@@ -49,6 +50,7 @@ function minify() {
         alert(err)
     }
 }
+
 function downloadJson() {
     var element = document.createElement("a");
     let textToCopy = document.getElementById(`jsonField`)
@@ -67,14 +69,17 @@ function downloadJson() {
         alert(err)
     }
 }
+
 function currentTime() {
     return Math.round(new Date().getTime() / 1000).toString()
 }
+
 function copyText(t) {
     let textToCopy = document.getElementById(`jsonField`)
     textToCopy.select()
     document.execCommand("copy")
 }
+
 function validateJson() {
     let textToCopy = document.getElementById(`jsonField`)
     try {
@@ -84,14 +89,36 @@ function validateJson() {
         alert(err)
     }
 }
-function isValidJson(json) {
+function isValidJson() {
+    let textToCopy = document.getElementById(`jsonField`)
     try {
-        JSON.parse(json)
+        JSON.parse(textToCopy.value)
         return true
     } catch (err) {
         return false
     }
 }
+
+function isValidJson5() {
+    let textToCopy = document.getElementById(`jsonField`)
+    try {
+        JSON5.parse(textToCopy.value)
+        return true
+    } catch (err) {
+        return false
+    }
+}
+
+function validateJson5() {
+    let textToCopy = document.getElementById(`jsonField`)
+    try {
+        JSON5.parse(textToCopy.value)
+        alert("Valid JSON5")
+    } catch (err) {
+        alert(err)
+    }
+}
+
 function blankText() {
     const btnList = $('.btn')
     const flag = document.getElementById("jsonField").value === ""
@@ -99,6 +126,7 @@ function blankText() {
         btnList[i].disabled = flag
     }
 }
+
 function clearText() {
     document.getElementById('jsonField').value = ""
     blankText()
