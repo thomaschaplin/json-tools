@@ -17,7 +17,6 @@ Accepts [JSON](https://www.json.org/) or [JSON5](https://json5.org/) format
 
 ### Todo:
 * Make readme pretty
-* Improve JSON/JSON5 error handling
 * Dark & Light Theme
 * Allow user to input file name on download
 * Upgrade textarea to use a code editor
