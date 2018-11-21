@@ -12,17 +12,19 @@
     <link rel="icon" href="favicon.ico" type="image/gif" sizes="16x16">
 </head>
 
-<body class="p-3 mb-2 bg-dark text-white" id="body">
+<body class="p-3 mb-2 bg-dark text-white" id="body" onload="blankText()">
     <div>
         <h1>JSON Tools</h1>
         <textarea class="form-control" id="jsonField" onkeyup="blankText()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Input or drop JSON or JSON5 here..."></textarea>
         <br>
-        <button type="button" class="btn btn-light" id="pretty-button" onclick="prettyPrint()" disabled>Pretty Print</button>
-        <button type="button" class="btn btn-light" id="minify-button" onclick="minify()" disabled>Minify</button>
+        <button type="button" class="btn btn-light" id="pretty-button" onclick="prettyPrintJson()" disabled>Pretty Print JSON</button>
+        <button type="button" class="btn btn-light" id="pretty-button" onclick="prettyPrintJson5()" disabled>Pretty Print JSON5</button>
+        <button type="button" class="btn btn-light" id="minify-button" onclick="minifyJson()" disabled>Minify JSON</button>
+        <button type="button" class="btn btn-light" id="minify-button" onclick="minifyJson5()" disabled>Minify JSON5</button>
         <button type="button" class="btn btn-light" id="validate-json-button" onclick="validateJson()" disabled>Validate JSON</button>
         <button type="button" class="btn btn-light" id="validate-json5-button" onclick="validateJson5()" disabled>Validate JSON5</button>
         <button type="button" class="btn btn-light" id="download-button" onclick="downloadJson()" disabled>Download</button>
-        <button type="button" class="btn btn-light" id="copy-button" onclick="copyText('pretty')" disabled>Copy</button>
+        <button type="button" class="btn btn-light" id="copy-button" onclick="copyText()" disabled>Copy</button>
         <button type="button" class="btn btn-light" id="clear-button" onclick="clearText()" disabled>Clear</button>
     </div>
 </body>
