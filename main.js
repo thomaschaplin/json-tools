@@ -73,7 +73,7 @@ function prettyPrintJson() {
 }
 
 function prettyPrintJson5() {
-    if (isValidJson5() === true && parseJson5() !== false) {
+    if (isValidJson5() && parseJson5() !== false) {
         document.getElementById(`jsonField`).value = JSON5.stringify(parseJson5(rawJsonData()), undefined, 2)
     } else {
         validateJson5()
