@@ -2,6 +2,48 @@ const INDENT = 2;
 const THEME_KEY = "json-tools-theme";
 const JSON5_URL = "https://cdn.jsdelivr.net/npm/json5@2/+esm";
 
+// Sample data so a first-time visitor can try the tool without hunting for JSON.
+// The JSON5 variant uses the same data but leans on JSON5-only syntax (a comment,
+// unquoted keys, single quotes, a trailing comma) to show off what the mode allows.
+const EXAMPLE_JSON = `{
+    "name": "JSON Tools",
+    "version": "1.0.0",
+    "private": false,
+    "tags": ["json", "json5", "formatter"],
+    "author": {
+        "name": "Thomas Chaplin",
+        "url": "https://json.thomaschaplin.me"
+    },
+    "features": {
+        "prettyPrint": true,
+        "minify": true,
+        "validate": true,
+        "offline": true
+    },
+    "stars": 42,
+    "license": null
+}`;
+
+const EXAMPLE_JSON5 = `{
+    // JSON5 allows comments, unquoted keys, single quotes and trailing commas.
+    name: 'JSON Tools',
+    version: '1.0.0',
+    private: false,
+    tags: ['json', 'json5', 'formatter'],
+    author: {
+        name: 'Thomas Chaplin',
+        url: 'https://json.thomaschaplin.me',
+    },
+    features: {
+        prettyPrint: true,
+        minify: true,
+        validate: true,
+        offline: true,
+    },
+    stars: 42,
+    license: null,
+}`;
+
 // JSON5 is loaded lazily from a CDN the first time it is needed, so the app
 // (and all JSON-only features) work instantly with no network dependency.
 let json5Promise;
@@ -93,9 +135,13 @@ async function parse() {
     }
 }
 
+// The "Example" button stays enabled on an empty editor — loading a sample is the
+// one action that makes sense with no input yet.
+const toggleButtons = actionButtons.filter((button) => button.dataset.action !== "example");
+
 function refreshButtons() {
     const empty = rawJsonData().trim() === "";
-    for (const button of actionButtons) {
+    for (const button of toggleButtons) {
         button.disabled = empty;
     }
 }
@@ -165,7 +211,17 @@ function clear() {
     field.focus();
 }
 
-const handlers = { pretty: prettyPrint, minify, validate, copy, download, clear };
+function loadExample() {
+    if (rawJsonData().trim() !== "" && !window.confirm("Replace the current contents with example data?")) {
+        return; // keep the user's input
+    }
+    field.value = currentMode().label === "JSON5" ? EXAMPLE_JSON5 : EXAMPLE_JSON;
+    refreshButtons();
+    field.focus();
+    toast("Loaded example data.", { type: "success" });
+}
+
+const handlers = { pretty: prettyPrint, minify, validate, copy, download, example: loadExample, clear };
 
 /* ------------------------------------------------------------------ theming */
 
