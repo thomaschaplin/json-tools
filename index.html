@@ -31,6 +31,19 @@
     <meta name="twitter:image" content="https://json.thomaschaplin.me/og-image.png">
     <meta name="twitter:image:alt" content="JSON Tools — format, minify and validate JSON or JSON5 in your browser.">
 
+    <!-- Set the theme before first paint so the page never flashes the wrong colours. -->
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem("json-tools-theme");
+                if (t !== "light" && t !== "dark") {
+                    t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+                }
+                document.documentElement.setAttribute("data-theme", t);
+            } catch (e) {}
+        })();
+    </script>
+
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="favicon.ico" type="image/gif" sizes="16x16">
 
@@ -115,12 +128,6 @@
             <div class="drop-overlay" aria-hidden="true">Drop file to load</div>
         </div>
 
-        <footer class="app-footer">
-            <a href="https://ko-fi.com/A0A4MCB0" target="_blank" rel="noopener">
-                <img height="36" style="border:0;height:36px;" src="https://az743702.vo.msecnd.net/cdn/kofi5.png?v=0"
-                    alt="Buy Me a Coffee at ko-fi.com" loading="lazy" />
-            </a>
-        </footer>
     </div>
 
     <div id="toasts" class="toasts" role="status" aria-live="polite" aria-atomic="false"></div>

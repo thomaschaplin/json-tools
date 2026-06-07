@@ -287,6 +287,14 @@ setupDropZone();
 themeToggle.addEventListener("click", toggleTheme);
 field.addEventListener("input", refreshButtons);
 
+// Follow the device theme live, but only while the user hasn't made a manual
+// choice — a saved preference always wins.
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+    if (!localStorage.getItem(THEME_KEY)) {
+        applyTheme(e.matches ? "dark" : "light");
+    }
+});
+
 for (const button of actionButtons) {
     button.addEventListener("click", () => {
         const action = handlers[button.dataset.action];
