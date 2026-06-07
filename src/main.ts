@@ -4,6 +4,7 @@ import { currentMode, parsers, type Mode } from "./parsers";
 import { EXAMPLE_JSON, EXAMPLE_JSON5 } from "./examples";
 import { haptic, requireEl, toast } from "./toast";
 import { currentTheme, onThemeChange, setupTheme } from "./theme";
+import { setupGlass } from "./glass";
 
 const INDENT = 2;
 
@@ -74,10 +75,24 @@ function minify(): void {
   if (result.ok) editor.setValue(result.codec.stringify(result.value, undefined));
 }
 
+// Replay the one-shot sheen-sweep across the editor: drop the class, force a
+// reflow so the animation can restart, then re-add it and clear up on finish.
+function flashSweep(): void {
+  dropZone.classList.remove("is-validated");
+  void dropZone.offsetWidth;
+  dropZone.classList.add("is-validated");
+  dropZone.addEventListener(
+    "animationend",
+    () => dropZone.classList.remove("is-validated"),
+    { once: true },
+  );
+}
+
 function validate(): void {
   const parser = activeParser();
   const result = parse();
   if (result.ok) {
+    flashSweep();
     toast(`Your input is valid ${parser.label}.`, {
       type: "success",
       title: `Valid ${parser.label}`,
@@ -211,6 +226,7 @@ setupTheme(themeToggle);
 onThemeChange((theme) => editor.setTheme(theme));
 refreshButtons();
 setupDropZone();
+setupGlass();
 
 for (const button of actionButtons) {
   button.addEventListener("click", () => {
@@ -222,9 +238,21 @@ for (const button of actionButtons) {
 
 // A light tick when switching format mode, matching the sliding-pill motion, and
 // keep the editor's linter in sync with the selected mode.
+const modeToggle = document.querySelector<HTMLElement>(".mode-toggle");
 for (const radio of document.querySelectorAll<HTMLInputElement>('input[name="mode"]')) {
   radio.addEventListener("change", () => {
     haptic(6);
     editor.setMode(currentMode());
+    // Drive the thumb's liquid stretch for the length of the slide.
+    if (modeToggle) {
+      modeToggle.classList.remove("is-sliding");
+      void modeToggle.offsetWidth;
+      modeToggle.classList.add("is-sliding");
+      modeToggle.addEventListener(
+        "animationend",
+        () => modeToggle.classList.remove("is-sliding"),
+        { once: true },
+      );
+    }
   });
 }

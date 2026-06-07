@@ -19,15 +19,44 @@
     --glass-bg-strong: rgba(255, 255, 255, 0.78);
     --glass-border: rgba(255, 255, 255, 0.7);
     --glass-highlight: rgba(255, 255, 255, 0.85);
-    --glass-blur: 18px;
+    --glass-blur: 20px;
+    /* Lensing: brighten + saturate + a touch of contrast so the backdrop
+       appears refracted through the glass rather than just blurred. */
+    --glass-filter: blur(var(--glass-blur)) saturate(180%) brightness(1.06) contrast(1.02);
     --glass-shadow: 0 8px 24px rgba(18, 26, 41, 0.12), 0 2px 6px rgba(18, 26, 41, 0.06);
+    /* Deeper, layered shadow for the hero editor surface. */
+    --glass-shadow-lg:
+        0 1px 1px rgba(255, 255, 255, 0.5) inset,
+        0 18px 50px -12px rgba(18, 26, 41, 0.28),
+        0 8px 20px -8px rgba(18, 26, 41, 0.18);
     --accent-glass: rgba(47, 111, 237, 0.82);
     --accent-glass-strong: rgba(47, 111, 237, 0.95);
 
+    /* Specular rim — a light source catching the top-left edge of the lens,
+       fading to a soft shadow at the bottom-right. Used as a gradient border. */
+    --glass-rim: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.35) 26%,
+        rgba(255, 255, 255, 0) 48%,
+        rgba(18, 26, 41, 0) 60%,
+        rgba(18, 26, 41, 0.12) 100%
+    );
+    --glass-sheen: rgba(255, 255, 255, 0.55);
+    --glass-inner-glow: rgba(255, 255, 255, 0.6);
+
+    /* Pointer-tracking position (updated per-surface by glass.ts). Safe
+       defaults keep the centred highlight static when JS is off. */
+    --mx: 50%;
+    --my: 50%;
+    --pointer: 0;
+
     /* Soft ambient backdrop blobs */
-    --blob-1: rgba(99, 152, 255, 0.35);
-    --blob-2: rgba(126, 110, 245, 0.28);
-    --blob-3: rgba(64, 196, 198, 0.26);
+    --blob-1: rgba(99, 152, 255, 0.42);
+    --blob-2: rgba(126, 110, 245, 0.34);
+    --blob-3: rgba(64, 196, 198, 0.32);
+    --blob-4: rgba(255, 122, 182, 0.24);
+    --blob-5: rgba(120, 220, 180, 0.22);
 
     --radius: 20px;
     --radius-sm: 14px;
@@ -62,12 +91,30 @@
     --glass-border: rgba(255, 255, 255, 0.12);
     --glass-highlight: rgba(255, 255, 255, 0.18);
     --glass-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.35);
+    --glass-shadow-lg:
+        0 1px 1px rgba(255, 255, 255, 0.12) inset,
+        0 20px 56px -12px rgba(0, 0, 0, 0.66),
+        0 8px 22px -8px rgba(0, 0, 0, 0.5);
     --accent-glass: rgba(91, 141, 239, 0.8);
     --accent-glass-strong: rgba(91, 141, 239, 0.92);
 
-    --blob-1: rgba(64, 104, 200, 0.4);
-    --blob-2: rgba(108, 84, 220, 0.34);
-    --blob-3: rgba(40, 150, 160, 0.3);
+    /* Dimmer rim + cooler sheen against the dark backdrop. */
+    --glass-rim: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.5) 0%,
+        rgba(255, 255, 255, 0.16) 26%,
+        rgba(255, 255, 255, 0) 48%,
+        rgba(0, 0, 0, 0) 60%,
+        rgba(0, 0, 0, 0.4) 100%
+    );
+    --glass-sheen: rgba(168, 198, 255, 0.4);
+    --glass-inner-glow: rgba(255, 255, 255, 0.16);
+
+    --blob-1: rgba(64, 104, 200, 0.46);
+    --blob-2: rgba(108, 84, 220, 0.4);
+    --blob-3: rgba(40, 150, 160, 0.34);
+    --blob-4: rgba(190, 70, 140, 0.3);
+    --blob-5: rgba(40, 160, 120, 0.26);
 }
 
 * {
@@ -108,28 +155,166 @@ body {
     touch-action: manipulation;
 }
 
-/* Soft ambient backdrop for the Liquid Glass surfaces to refract */
+/* Soft ambient backdrop for the Liquid Glass surfaces to refract. Two stacked
+   blob layers drift on independent timings so the mesh never visibly loops, and
+   a faint grain layer kills gradient banding and adds tactile depth. */
 .ambient {
     position: fixed;
     inset: 0;
     z-index: -1;
     overflow: hidden;
     pointer-events: none;
+    background: var(--bg);
+}
+
+.ambient::before,
+.ambient::after {
+    content: "";
+    position: absolute;
+    inset: -15%;
+    pointer-events: none;
+}
+
+/* Primary mesh — large slow blobs. */
+.ambient::before {
     background:
         radial-gradient(42rem 42rem at 12% 18%, var(--blob-1), transparent 60%),
         radial-gradient(38rem 38rem at 88% 22%, var(--blob-2), transparent 60%),
-        radial-gradient(46rem 46rem at 50% 96%, var(--blob-3), transparent 62%),
-        var(--bg);
-    animation: ambient-drift 32s ease-in-out infinite alternate;
+        radial-gradient(46rem 46rem at 50% 96%, var(--blob-3), transparent 62%);
+    animation: ambient-drift 34s ease-in-out infinite alternate;
+}
+
+/* Secondary mesh — smaller accent blobs drifting the other way for an organic,
+   non-repeating wash of colour. */
+.ambient::after {
+    background:
+        radial-gradient(30rem 30rem at 78% 72%, var(--blob-4), transparent 64%),
+        radial-gradient(34rem 34rem at 22% 80%, var(--blob-5), transparent 64%);
+    animation: ambient-drift-alt 47s ease-in-out infinite alternate;
+}
+
+/* Subtle film grain so the broad gradients don't band on wide displays. */
+.ambient-grain {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] .ambient-grain {
+    opacity: 0.07;
+    mix-blend-mode: soft-light;
 }
 
 @keyframes ambient-drift {
     from {
-        transform: translate3d(-2%, -1%, 0) scale(1.05);
+        transform: translate3d(-2%, -1%, 0) scale(1.05) rotate(0deg);
     }
 
     to {
-        transform: translate3d(2%, 1.5%, 0) scale(1.12);
+        transform: translate3d(2%, 1.5%, 0) scale(1.12) rotate(2deg);
+    }
+}
+
+@keyframes ambient-drift-alt {
+    from {
+        transform: translate3d(2%, 2%, 0) scale(1.1) rotate(0deg);
+    }
+
+    to {
+        transform: translate3d(-3%, -1.5%, 0) scale(1.04) rotate(-3deg);
+    }
+}
+
+/* ----------------------------------------------------- Liquid Glass surfaces */
+
+/* A reusable specular rim: a gradient "border" that catches light at the
+   top-left and falls into shadow at the bottom-right, masked so only the 1px
+   edge paints. Applied to every glass surface via [data-glass]. */
+[data-glass] {
+    position: relative;
+    isolation: isolate;
+}
+
+[data-glass]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--glass-rim);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* A soft specular highlight that tracks the pointer (glass.ts writes --mx/--my
+   and flips --pointer to 1 on hover). It fades in only while a fine pointer is
+   over the surface, so it's invisible on touch and with JS disabled.
+
+   Explicit list rather than [data-glass]::before so it doesn't collide with the
+   mode-toggle's own ::before (the sliding thumb), which carries data-glass too. */
+.icon-button::before,
+.button::before,
+.toast::before,
+.editor::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+        circle at var(--mx) var(--my),
+        var(--glass-sheen),
+        transparent 42%
+    );
+    opacity: calc(var(--pointer) * 0.5);
+    transition: opacity 0.3s var(--ease-out-ios);
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: screen;
+}
+
+[data-theme="dark"] :is(.icon-button, .button, .toast, .editor)::before {
+    opacity: calc(var(--pointer) * 0.6);
+}
+
+/* On the editor the sheen must sit behind the code, so the layer drops below the
+   content (which is lifted to z-index 1 below) and uses a gentler ceiling. */
+.editor::before {
+    z-index: 0;
+    opacity: calc(var(--pointer) * 0.35);
+}
+
+/* Press ripple spawned at the pointer-down point for gel-like feedback. */
+.glass-ripple {
+    position: absolute;
+    top: var(--ry, 50%);
+    left: var(--rx, 50%);
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--glass-sheen), transparent 70%);
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.55;
+    animation: glass-ripple 0.6s var(--ease-out-ios) forwards;
+}
+
+@keyframes glass-ripple {
+    from {
+        transform: scale(0.3);
+        opacity: 0.55;
+    }
+    to {
+        transform: scale(14);
+        opacity: 0;
     }
 }
 
@@ -176,11 +361,13 @@ body {
     border-radius: 50%;
     border: 1px solid var(--glass-border);
     background: var(--glass-bg);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
     box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
     color: var(--text);
     cursor: pointer;
+    /* Contain the press ripple within the round button. */
+    overflow: hidden;
     transition: background 0.15s ease, transform 0.3s var(--ease-spring), border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -190,7 +377,11 @@ body {
 
 .icon-button:active {
     transform: scale(0.88);
-    transition-duration: 0.06s;
+    box-shadow:
+        var(--glass-shadow),
+        inset 0 2px 6px rgba(18, 26, 41, 0.22),
+        inset 0 1px 0 var(--glass-highlight);
+    transition-duration: 0.08s;
 }
 
 .theme-icon {
@@ -235,13 +426,14 @@ body {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-pill);
     background: var(--glass-bg);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
     box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
 }
 
 /* Sliding thumb — the single highlight that glides between the two options,
-   like an iOS segmented control. */
+   like an iOS segmented control. Position is driven by the `translate` property
+   so the `scale` property is free for an independent liquid stretch mid-slide. */
 .mode-toggle::before {
     content: "";
     position: absolute;
@@ -252,12 +444,25 @@ body {
     border-radius: var(--radius-pill);
     background: var(--glass-bg-strong);
     box-shadow: 0 2px 8px rgba(18, 26, 41, 0.16), inset 0 1px 0 var(--glass-highlight);
-    transition: transform 0.34s var(--ease-ios);
+    translate: 0 0;
+    transition: translate 0.34s var(--ease-ios);
     pointer-events: none;
+    z-index: 0;
 }
 
 .mode-toggle:has(.mode-option:last-child input:checked)::before {
-    transform: translateX(100%);
+    translate: 100% 0;
+}
+
+/* main.ts adds .is-sliding for the slide duration; the thumb squashes wider and
+   shorter at the midpoint then settles, so it "flows" rather than rigidly slides. */
+.mode-toggle.is-sliding::before {
+    animation: thumb-stretch 0.34s var(--ease-ios);
+}
+
+@keyframes thumb-stretch {
+    0%, 100% { scale: 1 1; }
+    45% { scale: 1.16 0.84; }
 }
 
 .mode-option {
@@ -306,8 +511,8 @@ body {
     appearance: none;
     border: 1px solid var(--accent-glass-strong);
     background: var(--accent-glass);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
     box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.4);
     color: var(--accent-contrast);
     font: inherit;
@@ -316,6 +521,8 @@ body {
     padding: 0.5rem 1.1rem;
     border-radius: var(--radius-pill);
     cursor: pointer;
+    /* Contain the press ripple within the pill. */
+    overflow: hidden;
     transition: filter 0.15s ease, transform 0.22s var(--ease-spring), background 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
 }
 
@@ -325,8 +532,14 @@ body {
 }
 
 .button:active:not(:disabled) {
-    transform: scale(0.95);
-    transition-duration: 0.06s;
+    /* Gel squish: shrink, sink a hair, and deepen the inner shadow so the
+       surface feels pressed in before springing back on release. */
+    transform: scale(0.95) translateY(1px);
+    box-shadow:
+        var(--glass-shadow),
+        inset 0 2px 6px rgba(18, 26, 41, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transition-duration: 0.08s;
 }
 
 .button:focus-visible {
@@ -351,7 +564,8 @@ body {
     filter: none;
 }
 
-/* Editor */
+/* Editor — the hero glass surface, so it carries the deepest, most layered
+   shadow and a focus glow when the embedded editor is active. */
 .editor {
     position: relative;
     flex: 1;
@@ -359,20 +573,81 @@ body {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     background: var(--glass-bg);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-shadow-lg);
     overflow: hidden;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition: border-color 0.2s var(--ease-out-ios), box-shadow 0.3s var(--ease-out-ios);
+}
+
+/* When CodeMirror takes focus, lift the rim and wrap the lens in a soft accent
+   glow — the panel itself conveys focus (CodeMirror's own outline is dropped). */
+.editor:has(.cm-editor.cm-focused) {
+    border-color: var(--accent-glass);
+    box-shadow: var(--glass-shadow-lg), 0 0 0 1px var(--accent-glass), 0 0 28px -4px var(--accent-soft);
 }
 
 .editor.is-dragover {
     border-color: var(--accent);
-    box-shadow: var(--glass-shadow), 0 0 0 3px var(--accent-soft);
+    box-shadow: var(--glass-shadow-lg), 0 0 0 3px var(--accent-soft);
 }
 
-/* The editor host wraps a CodeMirror 6 instance which fills the glass panel. */
+/* Progressive enhancement: where a browser can run an SVG filter inside
+   backdrop-filter, add a gentle turbulence displacement so the ambient behind
+   the lens appears refracted. Guarded so the base blur is never dropped on
+   browsers that don't support url() backdrops. Only affects the backdrop — the
+   code on top stays perfectly crisp. */
+@supports (backdrop-filter: url("#liquid-glass")) or (-webkit-backdrop-filter: url("#liquid-glass")) {
+    .editor {
+        -webkit-backdrop-filter: var(--glass-filter) url("#liquid-glass");
+        backdrop-filter: var(--glass-filter) url("#liquid-glass");
+    }
+}
+
+/* A specular highlight that sweeps diagonally across the lens on a successful
+   validate — a quick "ping" of light. Sits above the code but ignores input. */
+.editor-sweep {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0;
+    background: linear-gradient(
+        115deg,
+        transparent 30%,
+        var(--glass-sheen) 48%,
+        rgba(255, 255, 255, 0.1) 52%,
+        transparent 70%
+    );
+    background-size: 280% 100%;
+    background-position: 120% 0;
+    mix-blend-mode: screen;
+}
+
+.editor.is-validated .editor-sweep {
+    animation: editor-sweep 0.85s var(--ease-out-ios);
+}
+
+@keyframes editor-sweep {
+    0% {
+        opacity: 0;
+        background-position: 120% 0;
+    }
+    15% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        background-position: -60% 0;
+    }
+}
+
+/* The editor host wraps a CodeMirror 6 instance which fills the glass panel.
+   Lifted above the pointer-sheen layer so code stays crisp. */
 .editor-input {
+    position: relative;
+    z-index: 1;
     flex: 1;
     display: flex;
     min-width: 0;
@@ -414,6 +689,8 @@ body {
 .drop-overlay {
     position: absolute;
     inset: 0;
+    /* Above the code, sweep and rim so it covers everything while dragging. */
+    z-index: 4;
     display: grid;
     place-items: center;
     background: var(--accent-soft);
@@ -454,8 +731,8 @@ body {
     padding: 0.7rem 1rem;
     border-radius: var(--radius-sm);
     background: var(--glass-bg-strong);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
     color: var(--text);
     border: 1px solid var(--glass-border);
     border-left: 4px solid var(--accent);
@@ -534,7 +811,10 @@ body {
         transition-duration: 0.001ms !important;
     }
 
-    .ambient {
+    /* The universal selector above doesn't reach pseudo-elements, so silence the
+       drifting ambient layers explicitly. */
+    .ambient::before,
+    .ambient::after {
         animation: none;
     }
 }

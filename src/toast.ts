@@ -66,6 +66,8 @@ export function toast(
 ): void {
   const el = document.createElement("div");
   el.className = `toast toast--${type}`;
+  // Opt into the Liquid Glass surface treatment (specular rim + pointer sheen).
+  el.dataset.glass = "";
   if (title) {
     const heading = document.createElement("p");
     heading.className = "toast__title";
