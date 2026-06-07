@@ -1,6 +1,6 @@
 # JSON Tools
 
-[JSON Tools Website](http://json.thomaschaplin.me)
+[JSON Tools Website](https://json.thomaschaplin.me)
 
 A fast, free, browser-based tool to work with JSON files.
 
@@ -8,6 +8,7 @@ Accepts [JSON](https://www.json.org/) or [JSON5](https://json5.org/) format.
 
 ## Features
 
+- Syntax-highlighted editor with line numbers and inline error highlighting ([CodeMirror 6](https://codemirror.net/))
 - Pretty print
 - Minify
 - Validate
@@ -17,34 +18,48 @@ Accepts [JSON](https://www.json.org/) or [JSON5](https://json5.org/) format.
 - Clear
 - Drag 'n' drop files
 - Light & dark theme (remembers your choice, follows your system by default)
+- Installable PWA &mdash; add to your home screen and use it offline like a native app
 
 Everything runs entirely in your browser &mdash; your data never leaves your machine.
 
 ## Tech
 
-A zero-build static site: plain HTML, CSS and vanilla JavaScript (ES modules).
-The only dependency is [JSON5](https://json5.org/), loaded on demand from a CDN.
-No jQuery, no Bootstrap, no build step.
+Built with [Vite](https://vite.dev/) and TypeScript. The editor is
+[CodeMirror 6](https://codemirror.net/); [JSON5](https://json5.org/) is bundled
+as a dependency (so it works fully offline). The app is a Progressive Web App
+&mdash; [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) generates the web
+app manifest and a Workbox service worker for offline use and home-screen
+installability. No framework (no React/Vue), no jQuery, no Bootstrap.
 
 For discoverability the site ships static SEO assets &mdash; Open Graph /
 Twitter Card meta tags and a social preview image (`og-image.png`), JSON-LD
-structured data, `robots.txt` and `sitemap.xml` &mdash; all served directly by
-GitHub Pages with no build step.
+structured data, `robots.txt` and `sitemap.xml` &mdash; served verbatim from
+`public/`.
 
 ## Development
 
-Because the site uses ES modules, open it through a local server rather than the
-`file://` protocol:
-
 ```sh
-python3 -m http.server 8000
-# then visit http://localhost:8000
+npm install
+npm run dev      # start the dev server (http://localhost:5173)
+npm run build    # type-check and build to dist/
+npm run preview  # serve the production build locally
 ```
+
+App icons are generated from `src/icon.svg` into `public/` (pwa-192/512 and
+apple-touch-icon); regenerate them with `sharp` if the source changes.
+
+## Deployment
+
+Pushing to `master` triggers `.github/workflows/deploy.yml`, which builds with
+Vite and deploys `dist/` to GitHub Pages. The `CNAME` lives in `public/` so the
+custom domain is preserved in every build.
+
+> One-time setup: in the repository's **Settings → Pages**, set
+> **Build and deployment → Source** to **GitHub Actions**.
 
 ## Ideas / Todo
 
 - JSON to CSV
 - Search within input
 - Scrape URL
-- Syntax highlighting / code editor
 - Compare two JSON inputs
