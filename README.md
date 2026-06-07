@@ -13,6 +13,7 @@ Accepts [JSON](https://www.json.org/) or [JSON5](https://json5.org/) format.
 - Validate
 - Copy to clipboard
 - Download (choose your own file name)
+- Load example (mode-aware sample data)
 - Clear
 - Drag 'n' drop files
 - Light & dark theme (remembers your choice, follows your system by default)
@@ -47,4 +48,3 @@ python3 -m http.server 8000
 - Scrape URL
 - Syntax highlighting / code editor
 - Compare two JSON inputs
-- Load example JSON
