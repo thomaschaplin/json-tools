@@ -90,6 +90,56 @@ function rawJsonData() {
     return field.value;
 }
 
+// A subtle vibration on interaction. Progressive enhancement — supported on
+// Android/Chrome and silently ignored where the Vibration API is unavailable
+// (notably iOS Safari), so calling it is always safe.
+function haptic(ms = 8) {
+    navigator.vibrate?.(ms);
+}
+
+// Let an element be flicked away with a vertical swipe, iOS banner style. The
+// finger is tracked upward 1:1 (the dismiss direction) and damped downward, with
+// opacity fading as it travels. Past a small threshold the swipe commits and
+// `dismiss` is called; otherwise it springs back to rest.
+function makeSwipeable(el, dismiss) {
+    let startY = 0;
+    let dy = 0;
+    let dragging = false;
+
+    el.addEventListener("pointerdown", (e) => {
+        dragging = true;
+        startY = e.clientY;
+        dy = 0;
+        el.setPointerCapture(e.pointerId);
+        el.style.transition = "none";
+    });
+
+    el.addEventListener("pointermove", (e) => {
+        if (!dragging) return;
+        dy = e.clientY - startY;
+        if (dy > 0) dy *= 0.3; // resist dragging the wrong way
+        el.style.transform = `translateY(${dy}px)`;
+        el.style.opacity = String(Math.max(0, 1 + Math.min(0, dy) / 120));
+    });
+
+    const end = () => {
+        if (!dragging) return;
+        dragging = false;
+        el.style.transition = "";
+        if (dy < -40) {
+            haptic(6);
+            dismiss();
+        } else {
+            // Spring back to its resting position.
+            el.style.transform = "";
+            el.style.opacity = "";
+        }
+    };
+
+    el.addEventListener("pointerup", end);
+    el.addEventListener("pointercancel", end);
+}
+
 function toast(message, { type = "info", title } = {}) {
     const el = document.createElement("div");
     el.className = `toast toast--${type}`;
@@ -105,11 +155,16 @@ function toast(message, { type = "info", title } = {}) {
     el.appendChild(body);
     toasts.appendChild(el);
 
+    let removed = false;
     const remove = () => {
+        if (removed) return; // guard against the auto-timer and a swipe both firing
+        removed = true;
+        clearTimeout(timer);
         el.classList.add("is-leaving");
         el.addEventListener("animationend", () => el.remove(), { once: true });
     };
-    setTimeout(remove, type === "error" ? 6000 : 3000);
+    const timer = setTimeout(remove, type === "error" ? 6000 : 3000);
+    makeSwipeable(el, remove);
 }
 
 // Parse with the active mode, surfacing errors as toasts. Returns a result
@@ -237,8 +292,12 @@ function resolveInitialTheme() {
 
 function toggleTheme() {
     const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    haptic();
+    // Spin/shrink the icon out, swap the mask, then let it spring back in.
+    themeToggle.classList.add("is-toggling");
     applyTheme(next);
     localStorage.setItem(THEME_KEY, next);
+    setTimeout(() => themeToggle.classList.remove("is-toggling"), 200);
 }
 
 /* ----------------------------------------------------------------- drag/drop */
@@ -297,7 +356,13 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e)
 
 for (const button of actionButtons) {
     button.addEventListener("click", () => {
+        haptic(button.dataset.action === "clear" ? 12 : 8);
         const action = handlers[button.dataset.action];
         if (action) action();
     });
+}
+
+// A light tick when switching format mode, matching the sliding-pill motion.
+for (const radio of document.querySelectorAll('input[name="mode"]')) {
+    radio.addEventListener("change", () => haptic(6));
 }
