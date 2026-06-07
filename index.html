@@ -44,8 +44,14 @@
         })();
     </script>
 
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="favicon.ico" type="image/gif" sizes="16x16">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="16x16">
+
+    <!-- PWA / iOS standalone -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JSON Tools">
+    <meta name="mobile-web-app-capable" content="yes">
 
     <script type="application/ld+json">
     {
@@ -122,9 +128,7 @@
         </div>
 
         <div class="editor" id="dropZone">
-            <textarea class="editor-input" id="jsonField" autocomplete="off" autocorrect="off"
-                autocapitalize="off" spellcheck="false"
-                placeholder="Paste, type, or drop a JSON / JSON5 file here&hellip;"></textarea>
+            <div class="editor-input" id="jsonField"></div>
             <div class="drop-overlay" aria-hidden="true">Drop file to load</div>
         </div>
 
@@ -132,7 +136,7 @@
 
     <div id="toasts" class="toasts" role="status" aria-live="polite" aria-atomic="false"></div>
 
-    <script type="module" src="main.js"></script>
+    <script type="module" src="/src/main.ts"></script>
 </body>
 
 </html>
