@@ -352,12 +352,6 @@ body {
     display: grid;
 }
 
-/* Footer */
-.app-footer {
-    margin-top: 1.25rem;
-    text-align: center;
-}
-
 /* Toasts */
 .toasts {
     position: fixed;
