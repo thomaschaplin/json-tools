@@ -1,154 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="author" content="Thomas Chaplin">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="description" content="A fast, free tool to format, minify, validate, copy and download JSON and JSON5.">
     <meta name="color-scheme" content="light dark">
-    <meta name="theme-color" content="#eef1f6" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#0c0f16" media="(prefers-color-scheme: dark)">
-    <title>JSON Tools — Format, Minify & Validate JSON / JSON5</title>
-    <link rel="canonical" href="https://json.thomaschaplin.me/">
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="JSON Tools">
-    <meta property="og:title" content="JSON Tools — Format, Minify & Validate JSON / JSON5">
-    <meta property="og:description" content="A fast, free tool to format, minify, validate, copy and download JSON and JSON5. Everything runs in your browser — your data never leaves your machine.">
-    <meta property="og:url" content="https://json.thomaschaplin.me/">
-    <meta property="og:image" content="https://json.thomaschaplin.me/og-image.png">
-    <meta property="og:image:type" content="image/png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="JSON Tools — format, minify and validate JSON or JSON5 in your browser.">
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="JSON Tools — Format, Minify & Validate JSON / JSON5">
-    <meta name="twitter:description" content="A fast, free tool to format, minify, validate, copy and download JSON and JSON5. Runs entirely in your browser.">
-    <meta name="twitter:image" content="https://json.thomaschaplin.me/og-image.png">
-    <meta name="twitter:image:alt" content="JSON Tools — format, minify and validate JSON or JSON5 in your browser.">
-
-    <!-- Set the theme before first paint so the page never flashes the wrong colours. -->
-    <script>
-        (function () {
-            try {
-                var t = localStorage.getItem("json-tools-theme");
-                if (t !== "light" && t !== "dark") {
-                    t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-                }
-                document.documentElement.setAttribute("data-theme", t);
-            } catch (e) {}
-        })();
-    </script>
-
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="16x16">
-
-    <!-- PWA / iOS standalone -->
+    <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b0d12" media="(prefers-color-scheme: dark)">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <!--seo:head-->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="JSON Tools">
     <meta name="mobile-web-app-capable" content="yes">
-
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "JSON Tools",
-        "url": "https://json.thomaschaplin.me/",
-        "description": "A fast, free tool to format, minify, validate, copy and download JSON and JSON5. Everything runs in your browser — your data never leaves your machine.",
-        "applicationCategory": "DeveloperApplication",
-        "operatingSystem": "Any",
-        "browserRequirements": "Requires JavaScript and a modern browser.",
-        "inLanguage": "en",
-        "isAccessibleForFree": true,
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        },
-        "author": {
-            "@type": "Person",
-            "name": "Thomas Chaplin"
-        },
-        "featureList": [
-            "Pretty print JSON and JSON5",
-            "Minify JSON and JSON5",
-            "Validate JSON and JSON5",
-            "Copy to clipboard",
-            "Download as a file",
-            "Load example JSON",
-            "Drag and drop files",
-            "Light and dark theme"
-        ]
-    }
+    <!-- Apply the saved theme before first paint so the page never flashes. -->
+    <script>
+      (function () {
+        var t = "system";
+        try {
+          var s = JSON.parse(localStorage.getItem("jt.settings.v2") || "{}");
+          if (s.theme === "light" || s.theme === "dark") t = s.theme;
+        } catch (e) {}
+        var dark = t === "dark" || (t === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+      })();
     </script>
-</head>
-
-<body>
-    <div class="ambient" aria-hidden="true"></div>
-    <div class="ambient-grain" aria-hidden="true"></div>
-
-    <!-- Liquid Glass lensing filter: a gentle turbulence displacement applied to
-         the editor's backdrop where supported, for a watery refraction. Purely a
-         progressive enhancement (see the @supports guard in style.css). -->
-    <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
-        <filter id="liquid-glass" x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="7" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="14" xChannelSelector="R" yChannelSelector="G" />
-        </filter>
-    </svg>
-
-    <a class="skip-link" href="#jsonField">Skip to editor</a>
-
-    <div class="app">
-        <header class="app-header">
-            <h1 class="app-title">JSON Tools</h1>
-            <button type="button" id="themeToggle" class="icon-button" data-glass aria-label="Toggle colour theme" title="Toggle theme">
-                <span class="theme-icon" aria-hidden="true"></span>
-            </button>
-        </header>
-
-        <p class="app-subtitle">Format, minify and validate <strong>JSON</strong> or <strong>JSON5</strong> &mdash; right in your browser.</p>
-
-        <div class="toolbar">
-            <fieldset class="mode-toggle" data-glass aria-label="Format mode">
-                <legend class="visually-hidden">Format mode</legend>
-                <label class="mode-option">
-                    <input type="radio" name="mode" value="json" checked>
-                    <span>JSON</span>
-                </label>
-                <label class="mode-option">
-                    <input type="radio" name="mode" value="json5">
-                    <span>JSON5</span>
-                </label>
-            </fieldset>
-
-            <div class="actions">
-                <button type="button" class="button" data-glass data-action="pretty" disabled>Pretty Print</button>
-                <button type="button" class="button" data-glass data-action="minify" disabled>Minify</button>
-                <button type="button" class="button" data-glass data-action="validate" disabled>Validate</button>
-                <button type="button" class="button" data-glass data-action="copy" disabled>Copy</button>
-                <button type="button" class="button" data-glass data-action="download" disabled>Download</button>
-                <button type="button" class="button button-ghost" data-glass data-action="example">Example</button>
-                <button type="button" class="button button-ghost" data-glass data-action="clear" disabled>Clear</button>
-            </div>
-        </div>
-
-        <div class="editor" id="dropZone" data-glass>
-            <div class="editor-input" id="jsonField"></div>
-            <div class="editor-sweep" aria-hidden="true"></div>
-            <div class="drop-overlay" aria-hidden="true">Drop file to load</div>
-        </div>
-
+  </head>
+  <body>
+    <a class="skip-link" href="#about">Skip to description</a>
+    <div id="app" class="app">
+      <noscript>
+        <div class="noscript">JSON Tools runs entirely in your browser and needs JavaScript enabled.</div>
+      </noscript>
     </div>
-
-    <div id="toasts" class="toasts" role="status" aria-live="polite" aria-atomic="false"></div>
-
+    <!--seo:about-->
     <script type="module" src="/src/main.ts"></script>
-</body>
-
+  </body>
 </html>
