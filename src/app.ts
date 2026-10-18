@@ -429,7 +429,7 @@ export function startApp(root: HTMLElement): void {
         h(
           "div",
           { class: "chips" },
-          ["https://api.github.com/repos/thomaschaplin/json-tools", "https://jsonplaceholder.typicode.com/users"].map((u) =>
+          ["https://jsonplaceholder.typicode.com/users"].map((u) =>
             h("button", { type: "button", class: "chip", onclick: () => { input.value = u; input.focus(); } }, new URL(u).host),
           ),
         ),
@@ -740,7 +740,6 @@ export function startApp(root: HTMLElement): void {
       button({ icon: "share", label: "Share", title: "Share a link", compact: true, onClick: () => void share() }),
       button({ icon: "command", title: "Command palette", kbd: kbd("Mod+K"), class: "palette-btn", onClick: () => palette() }),
       themeBtn,
-      h("a", { class: "btn btn-ghost btn-icon hide-narrow", href: "https://github.com/thomaschaplin/json-tools", target: "_blank", rel: "noopener", title: "Source on GitHub", "aria-label": "Source on GitHub" }, icon("github")),
     ),
   );
 
