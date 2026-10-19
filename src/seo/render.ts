@@ -127,8 +127,6 @@ export function renderAbout(page: Page): string {
         <footer class="site-footer">
           <span>Made by <a href="https://thomaschaplin.me" rel="author">Thomas Chaplin</a></span>
           <span>·</span>
-          <a href="https://github.com/thomaschaplin/json-tools">Source on GitHub</a>
-          <span>·</span>
           <span>Your data never leaves your device.</span>
         </footer>
       </div>
