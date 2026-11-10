@@ -63,6 +63,8 @@ npm run preview    # serve the production build
 npm run images     # regenerate icons, favicon and social cards into public/
 ```
 
+Requires Node.js 22 (the version CI uses).
+
 ### Project layout
 
 ```
@@ -85,3 +87,14 @@ code-split and load on demand.
 Pushing to `master` runs `.github/workflows/deploy.yml`, which tests, builds and deploys
 `dist/` to GitHub Pages. The `CNAME` lives in `public/`, so the custom domain is kept in every
 build.
+
+## Contributing
+
+Bug reports, ideas and pull requests are welcome. Please
+[open an issue](https://github.com/thomaschaplin/json-tools/issues) first for anything larger
+than a small fix so we can agree on the approach. Before opening a pull request, make sure
+`npm test` and `npm run build` pass.
+
+## License
+
+[MIT](LICENSE) © Thomas Chaplin
