@@ -4,6 +4,16 @@
   "version": "2.0.0",
   "type": "module",
   "description": "The JSON workbench for engineers: format, validate, repair, query, diff, convert and generate types — in your browser.",
+  "license": "MIT",
+  "author": "Thomas Chaplin (https://thomaschaplin.me)",
+  "homepage": "https://json.thomaschaplin.me",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thomaschaplin/json-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thomaschaplin/json-tools/issues"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
