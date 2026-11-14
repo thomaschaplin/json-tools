@@ -60,10 +60,11 @@ npm run dev        # dev server at http://localhost:5173
 npm test           # unit tests (Vitest)
 npm run build      # type-check and build to dist/
 npm run preview    # serve the production build
+npm run check      # everything CI runs: typecheck, tests, build, build-output check
 npm run images     # regenerate icons, favicon and social cards into public/
 ```
 
-Requires Node.js 22 (the version CI uses).
+Requires Node.js 22.12 or newer (see `.nvmrc`); CI tests on Node 22 and 24.
 
 ### Project layout
 
@@ -93,7 +94,7 @@ build.
 Bug reports, ideas and pull requests are welcome. Please
 [open an issue](https://github.com/thomaschaplin/json-tools/issues) first for anything larger
 than a small fix so we can agree on the approach. Before opening a pull request, make sure
-`npm test` and `npm run build` pass.
+`npm run check` passes.
 
 ## License
 
